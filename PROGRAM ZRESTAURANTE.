@@ -1,0 +1,137 @@
+PROGRAM ZRESTAURANTE.
+
+"----------------------------------------------------------------------
+
+"                [TABELA TRANSPARENTE: ZRESTEMPLOYEE]                 "
+
+"ID_GERENTE       TYPE ZIDGER CHAVE PRIMÁRIA -> ID
+"CARGO            TYPE ZGERENTE              -> CARGO
+"FUNCIONARIO      TYPE ZFUNCIONARIO          -> NOME
+"DATA_CONTRATACAO TYPE ZDATACONTR            -> DATA DA CONTRATAÇÃO
+"SEXO             TYPE ZSEXF                 -> SEXO
+"IDADE            TYPE ZIDADEF               -> IDADE
+"ORDENADO         TYPE ZORDENADO             -> ORDENADO OU SALÁRIO
+"DESCRICAO        TYPE ZDESCR                -> OBSERVAÇÕES
+"PAGAMENTO        TYPE ZPAGAMENTO            -> PAGAMENTO
+
+"----------------------------------------------------------------------
+
+TYPES WA_EMP TYPE ZRESTEMPLOYEE.                 "ESTRUTURA GLOBAL DO TIPO DA MINHA TABELA TRANSPARENTE.
+DATA  LS_EMP TYPE WA_EMP.                        "ESTRUTURA LOCAL DO TIPO DA MINHA ESTRUTURA GLOBAL.
+DATA  LT_EMP TYPE TABLE OF ZRESTEMPLOYEE.        "TABELA INTERNA DO TIPO DA MINHA TABELA TRANSPARENTE..
+
+DATA: OKCODE_100 TYPE SY-UCOMM,
+      OKCODE_200 TYPE SY-UCOMM,
+      OKCODE_300 TYPE SY-UCOMM.
+
+"----------------------------------------------------------------------
+
+*&---------------------------------------------------------------------*
+*& Module ANTES_DO_LOGIN_0100 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE ANTES_DO_LOGIN_0100 OUTPUT.
+* SET PF-STATUS 'xxxxxxxx'.
+* SET TITLEBAR 'xxx'.
+  
+  DATA:
+    IN1 TYPE C LENGTH 10,
+    IN2 TYPE C LENGTH 10.
+
+ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*&      Module  DEPOIS_DO_LOGIN_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE DEPOIS_DO_LOGIN_0100 INPUT.
+
+  CASE OKCODE_100.
+    WHEN 'FCT_ENTRAR'.
+      IF IN1 EQ 'ADMIN0' AND IN2 EQ '000'.
+        CALL SCREEN '200'.
+      ENDIF.
+    WHEN 'FCT_SAIR'.
+      LEAVE PROGRAM.
+  ENDCASE.
+
+ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*& Module ANTES_DE_SELECIONAR OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE ANTES_DE_SELECIONAR OUTPUT.
+* SET PF-STATUS 'xxxxxxxx'.
+* SET TITLEBAR 'xxx'.
+
+ENDMODULE.
+
+
+*&---------------------------------------------------------------------*
+*&      Module  DEPOIS_DE_SELECIONAR  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE DEPOIS_DE_SELECIONAR INPUT.
+
+  CASE OKCODE_200.
+    WHEN 'FCT_SAIR2'.
+      LEAVE PROGRAM.
+    WHEN 'FCT_CADASTRAR2'.
+      CALL SCREEN '300'.
+  ENDCASE.
+
+ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*& Module ANTES_DO_CADASTRO_300 OUTPUT
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+MODULE ANTES_DO_CADASTRO_300 OUTPUT.
+* SET PF-STATUS 'xxxxxxxx'.
+* SET TITLEBAR 'xxx'.
+
+  DATA:   IN1_3 TYPE ZGERENTE,
+          IN2_3 TYPE ZFUNCIONARIO,
+          IN3_3 TYPE ZDATACONTR,
+          IN4_3 TYPE ZSEXF,
+          IN5_3 TYPE ZIDADEF,
+          IN6_3 TYPE ZORDENADO,
+          IN7_3 TYPE ZDESCR.
+
+ENDMODULE.
+
+*&---------------------------------------------------------------------*
+*&      Module  DEPOIS_DE_CADASTRAR_300  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE DEPOIS_DE_CADASTRAR_300 INPUT.
+
+  CASE OKCODE_300.
+    WHEN 'FCT_SAIR3'.
+      LEAVE PROGRAM.
+    WHEN 'FCT_VOLTAR3'.
+      CALL SCREEN '200'.
+    WHEN 'FCT_CADASTRAR3'.
+
+      LS_EMP-CARGO = IN1_3.
+      LS_EMP-FUNCIONARIO = IN2_3.
+      LS_EMP-DATA_CONTRATACAO = IN3_3.
+      LS_EMP-SEXO = IN4_3.
+      LS_EMP-IDADE = IN5_3.
+      LS_EMP-ORDENADO = IN6_3.
+      LS_EMP-DESCRICAO = IN7_3.
+
+      APPEND LS_EMP TO LT_EMP.
+
+  ENDCASE.
+
+  BREAK-POINT.
+
+ENDMODULE.

@@ -1,0 +1,16 @@
+"----------------------------------------------------------------------
+
+"                [TABELA TRANSPARENTE: ZRESTEMPLOYEE]                 "
+
+"ID_GERENTE       TYPE ZIDGER CHAVE PRIMÁRIA -> ID
+"CARGO            TYPE ZGERENTE              -> CARGO
+"FUNCIONARIO      TYPE ZFUNCIONARIO          -> NOME
+"DATA_CONTRATACAO TYPE ZDATACONTR            -> DATA DA CONTRATAÇÃO
+"TURNO            TYPE ZTURNO                -> TURNO
+"SEXO             TYPE ZSEXF                 -> SEXO
+"IDADE            TYPE ZIDADEF               -> IDADE
+"ORDENADO         TYPE ZORDENADO             -> ORDENADO OU SALÁRIO
+"DESCRICAO        TYPE ZDESCR                -> OBSERVAÇÕES
+"PAGAMENTO        TYPE ZPAGAMENTO            -> PAGAMENTO
+
+"----------------------------------------------------------------------

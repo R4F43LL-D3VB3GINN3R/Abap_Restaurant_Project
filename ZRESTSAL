@@ -1,0 +1,19 @@
+"----------------------------------------------------------------------
+
+"                  [TABELA TRANSPARENTE: ZRESTSAL]                    "
+
+"ID               TYPE ZIDGER CHAVE PRIMÁRIA -> ID
+"SALBRUTO         TYPE ZSALBRUTO             -> SALÁRIO BRUTO
+"SALIQUIDO        TYPE ZSALIQUIDO            -> SALÁRIO LÍQUIDO
+"PLANSAUDE        TYPE ZPLANSAUDE            -> PLANO DE SAÚDE
+"CSINDICAL        TYPE ZSINDICAL             -> CONTRIBUIÇÃO SINDICAL
+"VALETRANS        TYPE ZVALETRANS            -> VALETRANSPORTE
+"HORAEXTRA        TYPE ZHORAEXTRA            -> HORAS EXTRAS
+"DEDUCOES         TYPE ZDEDUCOES             -> DEDUÇÕES SALARIAIS
+"SEGOSOCIAL       TYPE ZSEGSOCIAL            -> SEGURANÇA SOCIAL
+"IRS              TYPE ZIRS                  -> IRS
+"BONUS            TYPE ZBONUS                -> BÔNUS SALARIAL
+"SUBDECFER        TYPE ZSUBDECFER            -> SUBSÍDIO FÉRIAS & DÉCIMO 
+"SUBDP            TYPE ZSUBDP                -> SUBTRAÇÃO DE PRESENÇAS
+
+"----------------------------------------------------------------------

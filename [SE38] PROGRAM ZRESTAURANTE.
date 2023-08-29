@@ -281,7 +281,9 @@ MODULE ANTES_DA_CONSULTA_400 OUTPUT.
         CB2_4 TYPE ZSINDICAL,
         CB3_4 TYPE ZVALETRANS,
         IN2_4 TYPE ZHORAEXTRA,
-        IN5_4 TYPE ZSUBDECFER.
+        IN5_4 TYPE ZSUBDECFER,
+        IN3_4 TYPE ZSUBDP,
+        IN4_4 TYPE ZSUBDP.
 
 ENDMODULE.
 
@@ -299,18 +301,165 @@ MODULE DEPOIS_DA_CONSULTA_400 INPUT.
       LEAVE PROGRAM.
     WHEN 'FCT_INSERIR4'.
 
-      LS_SAL-ID = IN1_4.
-
-      APPEND LS_SAL TO LT_SAL.
-
-      SELECT ORDENADO FROM ZRESTEMPLOYEE INTO TABLE @DATA(LT_ORDENADO) WHERE ID_GERENTE = 1.
+      SELECT ORDENADO FROM ZRESTEMPLOYEE INTO TABLE @DATA(LT_ORDENADO) WHERE ID_GERENTE = @IN1_4.
 
       DATA: LV_ORDENADO TYPE ZORDENADO.
 
-      LOOP AT LT_ORDENADO INTO DATA(LS_ORDENADO). 
+      LOOP AT LT_ORDENADO INTO DATA(LS_ORDENADO).
         LV_ORDENADO = LS_ORDENADO-ORDENADO.
       ENDLOOP.
-      
+
+      "--------------------------"
+      "--------------------------"
+      "    TURNO DE TRABALHO     "
+      "--------------------------"
+      "--------------------------"
+
+      "VAMOS CUIDAR PARA QUE O TRABALHADOR NOTURNO RECEBA O SEU ADICIONAL NOTURNO"
+      "E QUE SEJA INFORMADO TAMBÉM EM QUAL TURNO ELE TRABALHA."
+
+      SELECT TURNO FROM ZRESTEMPLOYEE INTO TABLE @DATA(LT_TURNO) WHERE ID_GERENTE = @IN1_4.
+
+      DATA: LV_TURNO TYPE ZTURNO.
+
+      LOOP AT LT_TURNO INTO DATA(LS_TURNO).
+        LV_TURNO = LS_TURNO-TURNO.
+      ENDLOOP.
+
+      IF LV_TURNO = 'NOTURNO'.                                   "SE O TURNO DO EMPREGADO FOR NOTURNO"
+        LS_SAL-BONUS = LS_SAL-BONUS + ( '0.25' * LV_ORDENADO ).  "E A VARIÁVEL BÔNUS DE MINHA ESTRUTURA RECEBE MAIS 25% DO SALÁRIO BASE"
+      ELSE.                                                      "DO CONTRÁRIO...
+        LV_TURNO = 'DIURNO'.                                     "A VARIÁVEL DA MINHA ESTRUTURA RECEBE O NOME DIURNO"
+      ENDIF.
+
+      "--------------------------"
+      "--------------------------"
+      "      HORAS EXTRAS        "
+      "--------------------------"
+      "--------------------------"
+
+      "AQUI VAMOS CALCULAR COMO O VALOR DAS HORAS EXTRAS VAI SE COMPORTAR DE ACORDO COM O TURNO TRABALHADO"
+
+      DATA: LV_VALHRS TYPE P DECIMALS 2. "CRIA-SE UMA VARIÁVEL QUE IRÁ RECEBER O VALOR DA HORA"
+
+      LV_VALHRS = LV_ORDENADO / ( 8 * 22 ).  "ESTA É UMA LÓGICA BÁSICA PARA SE CALCULAR QUANTO VALE A HORA EXTRA BASEADA NO SALÁRIO BASE DO EMPREGADO"
+      "VALOR DA HORA = SALÁRIO BASE / ( 8 HORAS TRABALHADAS * 22 DIAS ÚTEIS DO MÊS).
+
+      IF LV_TURNO = 'DIURNO'.                "SE FOR DURANTE O DIA...
+        IN2_4 = IN2_4 * LV_VALHRS * 2.       "AS HORAS EXTRAS VALEM O DOBRO.
+      ELSEIF LV_TURNO = 'NOTURNO'.           "SE FOR DURANTE A NOITE...
+        IN2_4 = IN2_4 * LV_VALHRS * 3.       "AS HORAS EXTRAS VALEM O TRIPLO"
+      ELSE.                                  "EM QUALQUER OUTRO CASO...
+        IN2_4 = IN2_4 * LV_VALHRS * 1.       "ELAS VALEM O QUE SÃO."
+      ENDIF.
+
+      "PARA SE CALCULAR O VALOR TOTAL DAS HORAS EXTRAS A RECEBER...
+      "TOTAL DE HORAS EXTRAS = TOTAL DE HORAS EXTRAS * VALOR DA HORA DO FUNCIONÁRIO * TURNO TRABALHADO."
+
+      LS_SAL-HORAEXTRA = IN2_4.
+
+      "DIZEMOS ENTÃO QUE O VALOR TOTAL DAS HORAS EXTRAS EM MINHA ESTRUTURA RECEBE O RESULTADO CALCULADO DO PARÂMETRO."
+
+      LS_SAL-SALBRUTO = LV_ORDENADO + LS_SAL-HORAEXTRA.
+
+      "APROVEITAMOS E DIZEMOS QUE O SALÁRIO BRUTO RECEBE O SALÁRIO BASE + O VALOR DAS HORAS EXTRAS."
+
+      "--------------------------"
+      "--------------------------"
+      "   SUBSÍDIO E DÉCIMO      "
+      "--------------------------"
+      "--------------------------"
+
+      DATA: LV_YSDF TYPE P DECIMALS 2. "É CRIADA UMA VARIÁVEL LOCAL PARA RECEBER O VALOR DO SUBSÍDIO"
+
+      IF IN5_4 = 'MENSAL'.                                                   "SE OPTAR POR RECEBER O SUBSÍDIO MENSALMENTE...
+        LV_YSDF = LV_YSDF + ( LS_SAL-SALBRUTO / 12 ) + ( LV_ORDENADO / 12 ). "A VARIÁVEL LOCAL RECEBE O SUBSÍDIO FÉRIAS + SUBSÍDIO DÉCIMO TERCEIRO"
+      ELSE.                                                                  "DO CONTRÁRIO...
+        LV_YSDF = 0.                                                         "A VARIÁVEL RECEBE ZERO.
+      ENDIF.
+
+      LS_SAL-SUBDECFER = LV_YSDF. "A VARIÁVEL DE MINHA ESTRUTURA RECEBE O VALOR DO PARÂMETRO"
+
+      "--------------------------"
+      "--------------------------"
+      "       BENEFÍCIOS         "
+      "--------------------------"
+      "--------------------------"
+
+      "DEPENDENDO DOS BENEFÍCIOS DE SERVIÇO QUE O TRABALHADOR OPTAR POR ESCOLHER, ESTES MESMOS SERÃO ACRESCENTADOS ÀS DEDUÇÕES SALARIAIS."
+
+      IF CB1_4 = 'X'.                                                         "SE DECIDIR OPTAR POR UM PLANO DE SAÚDE PRIVADO...
+        LS_SAL-PLANSAUDE = 'OK'.                                              "A VARIÁVEL DA ESTRUTURA RECEBE O VALOR AUTORIZADO"
+        LS_SAL-DEDUCOES = LS_SAL-DEDUCOES + ( ( 5 / 100 ) * LV_ORDENADO ).    "O PREÇO DO PRODUTO É ACRESCIDO À VARIÁVEL DE DEDUÇÕES SALARIAIS.
+      ELSE.                                                                   "DO CONTRÁRIO...
+        LS_SAL-PLANSAUDE = 'NÃO'.                                             "A VARIÁVEL DA ESTRUTURA RECEBE O VALOR NÃO AUTORIZADO"
+      ENDIF.
+
+      IF CB2_4 = 'X'.                                                         "SE DECIDIR OPTAR POR UMA CONTRIBUIÇÃO SINDICAL...
+        LS_SAL-CSINDICAL = 'OK'.                                              "A VARIÁVEL DA ESTRUTURA RECEBE O VALOR AUTORIZADO"
+        LS_SAL-DEDUCOES = LS_SAL-DEDUCOES + 4.                                "O PREÇO DO PRODUTO É ACRESCIDO À VARIÁVEL DE DEDUÇÕES SALARIAIS.
+      ELSE.                                                                   "DO CONTRÁRIO...
+        LS_SAL-CSINDICAL = 'NÃO'.                                             "A VARIÁVEL DA ESTRUTURA RECEBE O VALOR NÃO AUTORIZADO"
+      ENDIF.
+
+      IF CB3_4 = 'X'.                                                         "SE DECIDIR OPTAR VALE TRANSPORTE...
+        LS_SAL-VALETRANS = 'OK'.                                              "A VARIÁVEL DA ESTRUTURA RECEBE O VALOR AUTORIZADO"
+        LS_SAL-BONUS = LS_SAL-BONUS + '103.5'.                                "O PREÇO DO PRODUTO É ACRESCIDO À VARIÁVEL DE DEDUÇÕES SALARIAIS
+      ELSE.                                                                   "DO CONTRÁRIO...
+        LS_SAL-VALETRANS = 'NÃO'.                                             "A VARIÁVEL DA ESTRUTURA RECEBE O VALOR NÃO AUTORIZADO"
+      ENDIF.
+
+      "DEPOIS DE TODOS OS SERVIÇOS OU NÃO, OS VALORES ESTARÃO SOMADOS E A VARIÁVEL LV_DEDUCT(DEDUÇÕES) RECEBERÁ ESTE VALOR.
+      "OU A VARIÁVEL LV_BONUS RECEBERÁ UM ACRÉSCIMO EM SEU VALOR."
+
+      "--------------------------"
+      "--------------------------"
+      "    SEGURANÇA SOCIAL      "
+      "--------------------------"
+      "--------------------------"
+
+      IF LV_ORDENADO < 886.
+        LS_SAL-DEDUCOES = LS_SAL-DEDUCOES + ( '0.11' * LV_ORDENADO ).
+        LS_SAL-SEGSOCIAL = '0.11' * LV_ORDENADO.
+      ENDIF.
+
+      "--------------------------"
+      "--------------------------"
+      "        DESEMPENHO        "
+      "--------------------------"
+      "--------------------------"
+
+      "CÁLCULO DE FALTAS E ATRASOS."
+
+      DATA: LV_FALTAS TYPE ZSUBDP,
+            LV_ATRASOS TYPE ZSUBDP.
+
+      IF IN3_4 > 0.
+        LV_FALTAS = IN3_4 * ( LV_ORDENADO / 22 ). "DIAS"
+      ELSE.
+        LV_FALTAS = 0.
+      ENDIF.
+
+      IF IN4_4 > 0.
+        LV_ATRASOS = IN4_4 * ( LV_ORDENADO / 176 ). "ATRASOS"
+      ELSE.
+        LV_ATRASOS = 0.
+      ENDIF.
+
+      LS_SAL-SUBDP = LV_FALTAS + LV_ATRASOS.
+      LS_SAL-DEDUCOES = LS_SAL-DEDUCOES + LS_SAL-SUBDP.
+
+      "POR FIM, JÁ TEMOS TODOS OS VALORES E AS LÓGICAS POR DETRÁS DELES...MENOS UM.
+      "NOSSO SALÁRIO LÍQUIDO, QUE É NOSSO SALÁRIO BRUTO MENOS TODAS AS DEDUÇÕES TRIBUTÁRIAS...
+      "AS DEDUÇÕES TRIBUTÁRIAS SÓ PODERIAM SER CALCULADAS EM TOTALIDADE APÓS SABER QUANTO CADA EMPREGADOR TERÁ DE DECLARAR PARA A SEGURANÇA SOCIAL E QUANTIFICAR OS SERVIÇOS QUE O EMPREGADOR ADERIU."
+      "SENDO ASSIM, PODEMOS ADMITIR QUE:"
+
+      LS_SAL-SALIQUIDO = LS_SAL-SALBRUTO - LS_SAL-DEDUCOES + LS_SAL-BONUS + LS_SAL-SUBDP.
+
+      APPEND LS_SAL TO LT_SAL.
+
+      BREAK-POINT.
+
   ENDCASE.
 
 ENDMODULE.

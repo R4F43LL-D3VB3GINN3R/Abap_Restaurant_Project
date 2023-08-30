@@ -2,9 +2,6 @@
 
 Sistema de Gerenciamento de Restaurante em SAP ABAP: Estrutura e Funcionalidades
 
-GITHUB [https://lnkd.in/dk29BYAs]
-[SE38] PROGRAM ZRESTAURANTE - MODULE POOL PROGRAMMING.
-
 O objetivo deste projeto reside na criação e simulação de um banco de dados para a gestão abrangente de um restaurante. O sistema é implementado utilizando a linguagem de programação SAP ABAP e engloba a manipulação de dados por meio de tabelas transparentes, sendo alimentado por meio de interfaces de tela elaboradas no Screen Painter, as quais estão conectadas ao backend do SAP.
 
 Tabelas Transparentes: Base Estrutural

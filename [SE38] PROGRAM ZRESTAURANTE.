@@ -77,7 +77,7 @@ DATA: OKCODE_100 TYPE SY-UCOMM, "VARIÁVEL DO TIPO COMANDO DE FUNÇÃO DYNPRO PA
 *&---------------------------------------------------------------------*
 *& Module ANTES_DO_LOGIN_0100 OUTPUT
 *&---------------------------------------------------------------------*
-*&
+*& "TELA DE LOGIN"
 *&---------------------------------------------------------------------*
 MODULE ANTES_DO_LOGIN_0100 OUTPUT.
 
@@ -85,22 +85,31 @@ MODULE ANTES_DO_LOGIN_0100 OUTPUT.
 * SET TITLEBAR 'xxx'.
 
   DATA:
-    IN1 TYPE C LENGTH 10, "LOGIN DO PROGRAMA NA TELA 100
-    IN2 TYPE C LENGTH 10. "SENHA DO PROGRAMA NA TELA 100
+    IN1      TYPE C LENGTH 10, "LOGIN DO PROGRAMA NA TELA 100
+    IN2      TYPE C LENGTH 10, "SENHA DO PROGRAMA NA TELA 100
+    CONTADOR TYPE INT1.        "CONTADOR PARA CONTAR O NÚMERO DE ERROS PERMITIDOS AO TENTAR LOGAR."
 
 ENDMODULE.
 
 *&---------------------------------------------------------------------*
 *&      Module  DEPOIS_DO_LOGIN_0100  INPUT
 *&---------------------------------------------------------------------*
-*       text
+*& "TELA DE LOGIN"
 *----------------------------------------------------------------------*
 MODULE DEPOIS_DO_LOGIN_0100 INPUT.
 
   CASE OKCODE_100.                         "EM CASO DE OKCODE_100...
     WHEN 'FCT_ENTRAR'.                     "E QUANDO O BOTÃO ENTRAR FOR PRESSIONADO...
+      CONTADOR = CONTADOR + 1.             "O CONTADOR COMEÇA A CONTAR."
       IF IN1 EQ 'ADMIN0' AND IN2 EQ '000'. "E SE O LOGIN FOR IGUAL A ADMIN0 JUNTAMENTE COM A SENHA IGUAL A 000...
         CALL SCREEN '200'.                 "IR PARA A TELA 100.
+      ELSE.                                "DO CONTRÁRIO...
+        IF CONTADOR >= 3.                  "SE O CONTADOR FOR MAIOR QUE 3...
+          LEAVE PROGRAM.                   "SAIR DO PPROGRAMA."
+        ELSE.                              "DO CONTRÁRIO...
+
+          MESSAGE |COMBINAÇÃO INVÁLIDA: { 3 - CONTADOR }]| TYPE 'S' DISPLAY LIKE 'I'. "EXIBIR MENSAGEM E UMA CONTAGEM REGRESSIVA DE POSSIBILIDADES DE TENTATIVAS."
+        ENDIF.
       ENDIF.
     WHEN 'FCT_SAIR'.                       "E QUANDO O BOTÃO SAIR FOR PRESSIONADO...
       LEAVE PROGRAM.                       "SAIR DO PROGRAMA.
@@ -111,7 +120,7 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *& Module ANTES_DE_SELECIONAR OUTPUT
 *&---------------------------------------------------------------------*
-*&
+*& "MENU DE OPÇÕES"
 *&---------------------------------------------------------------------*
 MODULE ANTES_DE_SELECIONAR OUTPUT.
 * SET PF-STATUS 'xxxxxxxx'.
@@ -123,7 +132,7 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  DEPOIS_DE_SELECIONAR  INPUT
 *&---------------------------------------------------------------------*
-*       text
+* "MENU DE OPÇÕES"
 *----------------------------------------------------------------------*
 MODULE DEPOIS_DE_SELECIONAR INPUT.
 
@@ -145,7 +154,7 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *& Module ANTES_DO_CADASTRO_300 OUTPUT
 *&---------------------------------------------------------------------*
-*&
+*& "TELA DE CADASTRO DE FUNCIONÁRIO"
 *&---------------------------------------------------------------------*
 MODULE ANTES_DO_CADASTRO_300 OUTPUT.
 * SET PF-STATUS 'xxxxxxxx'.
@@ -168,7 +177,7 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  DEPOIS_DE_CADASTRAR_300  INPUT
 *&---------------------------------------------------------------------*
-*       text
+* "TELA DE CADASTRO DE FUNCIONÁRIO"
 *----------------------------------------------------------------------*
 MODULE DEPOIS_DE_CADASTRAR_300 INPUT.
 
@@ -201,7 +210,7 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *& Module ANTES_DO_PAGAMENTO_500 OUTPUT
 *&---------------------------------------------------------------------*
-*&
+*& "TELA DE PAGAMENTO DE FUNCIONÁRIO"
 *&---------------------------------------------------------------------*
 MODULE ANTES_DO_PAGAMENTO_500 OUTPUT.
 * SET PF-STATUS 'xxxxxxxx'.
@@ -217,7 +226,7 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  DEPOIS_DO_PAGAMENTO_0500  INPUT
 *&---------------------------------------------------------------------*
-*       text
+* "TELA DE PAGAMENTO DE FUNCIONÁRIO"
 *----------------------------------------------------------------------*
 MODULE DEPOIS_DO_PAGAMENTO_0500 INPUT.
 
@@ -286,7 +295,7 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *& Module ANTES_DA_CONSULTA_400 OUTPUT
 *&---------------------------------------------------------------------*
-*&
+*& "TELA DE CONSULTA DE RELATÓRIOS"
 *&---------------------------------------------------------------------*
 MODULE ANTES_DA_CONSULTA_400 OUTPUT.
 * SET PF-STATUS 'xxxxxxxx'.
@@ -308,7 +317,7 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  DEPOIS_DA_CONSULTA_400  INPUT
 *&---------------------------------------------------------------------*
-*       text
+* "TELA DE CONSULTA DE RELATÓRIOS"
 *----------------------------------------------------------------------*
 MODULE DEPOIS_DA_CONSULTA_400 INPUT.
 
@@ -604,7 +613,7 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *& Module ANTES_EXCLUIR_FUNCIONARIO_0600 OUTPUT
 *&---------------------------------------------------------------------*
-*&
+*& "TELA DE EX-FUNCIONÁRIOS"
 *&---------------------------------------------------------------------*
 MODULE ANTES_EXCLUIR_FUNCIONARIO_0600 OUTPUT.
 * SET PF-STATUS 'xxxxxxxx'.
@@ -617,7 +626,7 @@ ENDMODULE.
 *&---------------------------------------------------------------------*
 *&      Module  DEPOIS_EXCLUIR_FUNCIONARI_0600  INPUT
 *&---------------------------------------------------------------------*
-*       text
+*  "TELA DE EX-FUNCIONÁRIOS"
 *----------------------------------------------------------------------*
 MODULE DEPOIS_EXCLUIR_FUNCIONARI_0600 INPUT.
 

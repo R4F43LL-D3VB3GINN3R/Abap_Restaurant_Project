@@ -13,7 +13,7 @@
 "SEGOSOCIAL       TYPE ZSEGSOCIAL            -> SEGURANÇA SOCIAL
 "IRS              TYPE ZIRS                  -> IRS
 "BONUS            TYPE ZBONUS                -> BÔNUS SALARIAL
-"SUBDECFER        TYPE ZSUBDECFER            -> SUBSÍDIO FÉRIAS & DÉCIMO 
+"SUBDECFER        TYPE ZSUBDECFER            -> SUBSÍDIO FÉRIAS & DÉCIMO
 "SUBDP            TYPE ZSUBDP                -> SUBTRAÇÃO DE PRESENÇAS
 
 "----------------------------------------------------------------------

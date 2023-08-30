@@ -1,0 +1,11 @@
+"----------------------------------------------------------------------
+
+"                [TABELA TRANSPARENTE: ZRESTEXC]                      "
+
+"ID               TYPE ZIDGER CHAVE PRIMÁRIA    -> ID
+"CARGO            TYPE ZGERENTE                 -> CARGO
+"FUNCIONARIO      TYPE ZFUNCIONARIO             -> NOME
+"DATA_CONTRATACAO TYPE ZDATACONTR               -> DATA DA CONTRATAÇÃO
+"ORDENADO         TYPE ZORDENADO                -> ORDENADO OU SALÁRIO
+
+"----------------------------------------------------------------------
